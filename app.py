@@ -7,13 +7,14 @@ from datetime import datetime, timedelta
 import warnings
 warnings.filterwarnings('ignore')
 
+# Assumed imported modules (DataHandler, DataPreprocessor, etc.)
 from data_handler import DataHandler
 from preprocessor import DataPreprocessor
 from models import PollutantForecaster
 from visualizer import Visualizer
 from utils import load_css, calculate_metrics, check_safety_thresholds, export_predictions_to_csv, export_predictions_to_json, export_summary_report
 
-# Page configuration
+# --- Streamlit Page Configuration ---
 st.set_page_config(
     page_title="Air Pollutant Forecasting Dashboard",
     page_icon="🌍",
@@ -21,13 +22,47 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Initialize session state
+# --- Session State Initialization ---
 if 'data_loaded' not in st.session_state:
     st.session_state.data_loaded = False
 if 'model_trained' not in st.session_state:
     st.session_state.model_trained = False
 if 'predictions_made' not in st.session_state:
     st.session_state.predictions_made = False
+
+# --- Global Components (Footer) ---
+
+def add_footer():
+    """Adds a stylish disclaimer footer to the application."""
+    st.markdown("---")
+    st.markdown(
+        """
+        <style>
+        .footer-text {
+            font-size: 0.85em;
+            color: #808495; /* Lighter text for the footer */
+            text-align: center;
+            margin-top: 20px;
+        }
+        .footer-bold {
+            font-weight: bold;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+    st.markdown(
+        """
+        <div class="footer-text">
+            <span class="footer-bold">Prototype Version Disclaimer:</span>
+            Model training time depends purely on the internet speed and the computational parameters you have chosen.
+            Please be patient during the training phase.
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+# --- Main Application Logic ---
 
 def main():
     st.title("🌍 Air Pollutant Forecasting Dashboard")
@@ -41,11 +76,13 @@ def main():
     )
     
     # Initialize components
+    # NOTE: Assuming DataHandler, DataPreprocessor, etc. classes are correctly defined in your other files.
     data_handler = DataHandler()
     preprocessor = DataPreprocessor()
     forecaster = PollutantForecaster()
     visualizer = Visualizer()
     
+    # Page routing
     if page == "Data Upload & Preview":
         data_upload_page(data_handler, visualizer)
     elif page == "Data Preprocessing":
@@ -55,8 +92,31 @@ def main():
     elif page == "Forecasting & Results":
         forecasting_page(forecaster, visualizer)
 
+    # Add the footer at the end of every run
+    add_footer()
+
 def data_upload_page(data_handler, visualizer):
     st.header("📁 Data Upload & Preview")
+    
+    # --- Data Download Section (NEW) ---
+    st.subheader("Dataset Download for Testing")
+    
+    # Placeholder for the dataset link from the image (global_air_quality_data_10000.csv)
+    DATA_URL = "https://github.com/Sanjeev0815/your_repo/raw/main/global_air_quality_data_10000.csv" 
+    
+    st.info("""
+    To easily test this prototype, you can download the sample dataset (`global_air_quality_data_10000.csv`). 
+    **Click the button below** to download the file directly from the repository link.
+    """)
+    
+    st.markdown(
+        f'<a href="{DATA_URL}" download="global_air_quality_data_10000.csv">'
+        f'<button style="background-color:#007BFF;color:white;padding:10px 20px;border:none;border-radius:5px;cursor:pointer;">'
+        f'⬇️ Download Sample Dataset</button></a>',
+        unsafe_allow_html=True
+    )
+    
+    st.markdown("---")
     
     # File upload section
     col1, col2 = st.columns(2)
@@ -180,7 +240,7 @@ def preprocessing_page(preprocessor, visualizer):
         
         st.subheader("Advanced Features")
         advanced_features = st.checkbox("Enable advanced domain-specific features", value=True, 
-                                       help="Includes interaction terms, atmospheric stability indicators, and photochemical potential")
+                                        help="Includes interaction terms, atmospheric stability indicators, and photochemical potential")
         
         if advanced_features:
             st.info("🧠 Advanced features include: heat index, wind chill, photochemical potential, atmospheric stability, pollutant ratios, and enhanced temporal encoding")
@@ -240,7 +300,7 @@ def preprocessing_page(preprocessor, visualizer):
                 feature_df = pd.DataFrame({
                     'Feature': processed_data['feature_names'],
                     'Type': ['Original' if not any(x in feat for x in ['lag', 'rolling']) 
-                            else 'Engineered' for feat in processed_data['feature_names']]
+                             else 'Engineered' for feat in processed_data['feature_names']]
                 })
                 st.dataframe(feature_df, width='stretch')
                 
@@ -296,7 +356,7 @@ def model_training_page(forecaster, visualizer):
     
     # Training button
     if st.button("🎯 Train Models", type="primary"):
-        with st.spinner("Training models... This may take a few minutes."):
+        with st.spinner("Training models... This may take a few minutes. Check the Prototype Disclaimer at the bottom for more details."):
             try:
                 # Train models for each target
                 models = {}
@@ -445,8 +505,12 @@ def forecasting_page(forecaster, visualizer):
         predictions = st.session_state.predictions
         baseline_predictions = st.session_state.get('baseline_predictions', None)
         
+        # NOTE: Using a default forecast_days value for display if button hasn't been pressed again
+        # This will be overridden if the button is pressed.
+        default_forecast_days = st.session_state.get('forecast_days', 2) 
+
         display_forecast_results(
-            predictions, baseline_predictions, targets, processed_data, visualizer, forecast_days
+            predictions, baseline_predictions, targets, processed_data, visualizer, default_forecast_days
         )
 
 def display_forecast_results(predictions, baseline_predictions, targets, processed_data, visualizer, forecast_days):
