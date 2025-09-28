@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 import warnings
 warnings.filterwarnings('ignore')
 
-# Assumed imported modules (DataHandler, DataPreprocessor, etc.)
+# Assumed imported modules (Ensure these files are present in your Streamlit folder)
 from data_handler import DataHandler
 from preprocessor import DataPreprocessor
 from models import PollutantForecaster
@@ -76,7 +76,6 @@ def main():
     )
     
     # Initialize components
-    # NOTE: Assuming DataHandler, DataPreprocessor, etc. classes are correctly defined in your other files.
     data_handler = DataHandler()
     preprocessor = DataPreprocessor()
     forecaster = PollutantForecaster()
@@ -98,15 +97,15 @@ def main():
 def data_upload_page(data_handler, visualizer):
     st.header("📁 Data Upload & Preview")
     
-    # --- Data Download Section (NEW) ---
+    # --- Data Download Section (UPDATED) ---
     st.subheader("Dataset Download for Testing")
     
-    # Placeholder for the dataset link from the image (global_air_quality_data_10000.csv)
-    DATA_URL = "https://github.com/Sanjeev0815/your_repo/raw/main/global_air_quality_data_10000.csv" 
+    # UPDATED LINK using the raw content URL from the user's repository
+    DATA_URL = "https://raw.githubusercontent.com/Sanjeev0815/TEST_demo/main/global_air_quality_data_10000.csv" 
     
     st.info("""
     To easily test this prototype, you can download the sample dataset (`global_air_quality_data_10000.csv`). 
-    **Click the button below** to download the file directly from the repository link.
+    **Click the button below** to download the file directly from the GitHub repository.
     """)
     
     st.markdown(
