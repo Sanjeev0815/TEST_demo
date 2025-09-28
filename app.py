@@ -101,7 +101,7 @@ def data_upload_page(data_handler, visualizer):
     st.subheader("Dataset Download for Testing")
     
     # UPDATED LINK using the raw content URL from the user's repository
-    DATA_URL = "https://raw.githubusercontent.com/Sanjeev0815/TEST_demo/main/global_air_quality_data_10000.csv" 
+    DATA_URL = "https://drive.google.com/file/d/1hKcDgmSMkuDW89WnL9hFAcZYmxSTdMt6/view?usp=sharing" 
     
     st.info("""
     To easily test this prototype, you can download the sample dataset (`global_air_quality_data_10000.csv`). 
